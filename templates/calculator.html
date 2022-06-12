@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<style>
+body {
+  overflow-x: hidden;
+  font-family: Sans-Serif;
+  margin: 0;
+}
+
+.menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  background: #232323;
+  color: #cdcdcd;
+  padding: 20px;
+  z-index: 1;
+  -webkit-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.menu-container a {
+  text-decoration: none;
+  color: #232323;
+  transition: color 0.3s ease;
+}
+
+.menu-container a:hover {
+  color: #00C6A7;
+}
+
+.menu-container input {
+  display: block;
+  width: 35px;
+  height: 25px;
+  margin: 0;
+  position: absolute;
+  cursor: pointer;
+  opacity: 0; /* hide this */
+  z-index: 2; /* and place it over the hamburger */
+  -webkit-touch-callout: none;
+}
+
+/* Burger menu */
+.menu-container span {
+  display: block;
+  width: 33px;
+  height: 4px;
+  margin-bottom: 5px;
+  position: relative;
+  background: #cdcdcd;
+  border-radius: 3px;
+  z-index: 1;
+  transform-origin: 4px 0px;
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              opacity 0.55s ease;
+}
+
+.menu-container span:first-child {
+  transform-origin: 0% 0%;
+}
+
+.menu-container span:nth-child(3) {
+  transform-origin: 0% 100%;
+}
+
+.menu-container input:checked ~ span {
+  opacity: 1;
+  transform: rotate(45deg) translate(3px,-1px);
+  background: #232323;
+}
+
+.menu-container input:checked ~ span:nth-child(4) {
+  opacity: 0;
+  transform: rotate(0deg) scale(0.2, 0.2);
+}
+
+.menu-container input:checked ~ span:nth-child(3) {
+  transform: rotate(-45deg) translate(-5px,11px);
+}
+
+.menu ul {
+  list-style: none;
+}
+
+.menu li {
+  padding: 10px 0;
+  font-size: 22px;
+}
+
+/* mobile styles */
+@media only screen and (max-width: 767px) { 
+  .menu-container {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .menu {
+    position: absolute;
+    box-sizing: border-box;
+    width: 300px;
+    right: -300px;
+    top: 0;
+    margin: -20px;
+    padding: 75px 50px 50px;
+    background: #cdcdcd;
+    -webkit-font-smoothing: antialiased;
+    /* to stop flickering of text in safari */
+    transform-origin: 0% 0%;
+    transform: translateX(0%);
+    transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+  }
+
+  .menu-container input:checked ~ .menu {
+    transform: translateX(-100%);
+  }
+}
+
+/* desktop styles */
+@media only screen and (min-width: 768px) { 
+  .menu-container {
+    width: 100%;
+  }
+
+  .menu-container a {
+    color: #cdcdcd;
+  }
+
+  .menu-container input {
+    display: none;
+  }
+
+  /* Burger menu */
+  .menu-container span {
+    display: none;
+  }
+
+  .menu {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .menu ul {
+    display: flex;
+    padding: 0;
+  }
+
+  .menu li {
+    padding: 0 20px;
+  }
+}
+  </style>
+<nav class="menu-container">
+  <!-- nav bar -->
+  <input type="checkbox" aria-label="Toggle menu" />
+  <span></span>
+  <span></span>
+  <span></span>
+
+  
+  <!-- menu items -->
+  <div class="menu">
+    <ul>
+      <li>
+        <a href="{{ url_for('main') }}">
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('about') }}">
+          About
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('calculate') }}">
+          Calculator
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/dburnett-engineer/">
+          My Profile
+        </a>
+      </li>
+    </ul>
+    <ul>
+    </ul>
+  </div>
+</nav>
+
+
+<html>
+  <head>
+    <title>Flask Moist Air Properties Calculator</title>
+  </head>
+
+  <body>
+    <section class="calculator" style="padding-left: 30px;" font-family="sans-serif">
+      <h1>Flask Moist Air Properties Calculator App</h1>
+
+      <form action="/calculate" method="POST">
+        <label for="air temperature">T - Air Temperature (&deg;F)</label>
+        <input type="number" step="any" placeholder="Air Temperature" name="air_temperature" />
+        <h3></h3><span style="color:blue;">{{acceptable_temperature_range}}</span></h3>
+      
+        <p><label for="air pressure">P - Air Pressure (psia)</label>
+        <input type="number" step="any" placeholder="Air Pressure" name="air_pressure" /></p>
+        <h3></h3><span style="color:blue;">{{acceptable_pressure_range}}</span></h3>
+
+     
+        <p><label for="absolute humidity">&omega; - Absolute Humidity (gr/lb)</label>
+        <input type="number" step="any" placeholder="Absolute Humidity" name="humidity_absolute" /></p>
+        <h3></h3><span style="color:blue;">{{acceptable_humidity_range}}</span></h3>
+        <h3></h3><span style="color:blue;">{{high_humidity}}</span></h3>
+
+        <input type="submit" style="background-color:green;color:white" value="Calculate" id="calc_btn" class="btn" />
+
+        <h3>The density is: <span style="color:blue;">{{density}}</span> lb/ft^3 </h3>
+        <h3>The saturation pressure is: <span style="color:blue;">{{ saturation_pressure }}</span> psia </h3>
+        <h3>The absolute humidity is: <span style="color:blue;">{{ humidity_absolute_converted }}</span> lb/lb </h3>
+        <h3>The relative humidity is: <span style="color:blue;">{{ relative_humidity }}</span> % </h3>
+
+      </form>
+    
+    <footer>
+    <br>
+      © 2022 <a href="https://www.linkedin.com/in/dburnett-engineer/">David Burnett
+        <br><iframe src="https://free.timeanddate.com/clock/i8dao31k/fn6/fs16/tct/pct/ahl/ftb/bas2/bat1/bacfff/tt0/tw1/th1/ta1/tb2" frameborder="0" width="304" height="25" allowtransparency="true"></iframe>
+      </a>
+    </footer>
+  </section>
+  </body>
+</html>
